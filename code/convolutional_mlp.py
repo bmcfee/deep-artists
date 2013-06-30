@@ -107,9 +107,9 @@ class LeNetConvPoolLayer(object):
         self.params = [self.W, self.b]
 
 
-def evaluate_lenet5(learning_rate=0.01, n_epochs=50,
+def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
                     dataset='../data/mnist.pkl.gz',
-                    nkerns=[15], batch_size=50):
+                    nkerns=[15], batch_size=100):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -151,10 +151,10 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=50,
 #     ishape = (28, 28)  # this is the size of MNIST images
     ishape = (64, 40)
     fshape = (9, 9)
-    pshape = (2, 2)
+    pshape = (8, 8)
 
     last_layer_size = 512
-    n_out = 10
+    n_out = 20
 
     ######################
     # BUILD ACTUAL MODEL #
@@ -171,7 +171,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=50,
     # 4D output tensor is thus of shape (batch_size,nkerns[0],12,12)
     layer0 = LeNetConvPoolLayer(rng, input=layer0_input,
             image_shape=(batch_size, 1, ishape[0], ishape[1]),
-            filter_shape=(nkerns[0], 1, fshape[0], fshape[1]), 
+            filter_shape=(nkerns[0], 1, fshape[0], fshape[1]),
             poolsize=pshape)
 
     # Construct the second convolutional pooling layer
@@ -237,7 +237,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=50,
     ###############
     print '... training'
     # early-stopping parameters
-    patience = 320  # look as this many examples regardless
+    patience = 20000  # look as this many examples regardless
     patience_increase = 2  # wait this much longer when a new best is
                            # found
     improvement_threshold = 0.995  # a relative improvement of this much is
@@ -311,7 +311,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=50,
                           ' ran for %.2fm' % ((end_time - start_time) / 60.))
 
 if __name__ == '__main__':
-    evaluate_lenet5(dataset='/home/bmcfee/artist_blah.npy.gz')
+    evaluate_lenet5(dataset='artist_blah.npy')
 
 
 def experiment(state, channel):

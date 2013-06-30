@@ -6,21 +6,31 @@ import os
 import sys
 import gzip
 
-def dostuff(inpath):
-    
-    
-    data_files = [f for f in os.listdir(inpath) if f.endswith('.mel.npy')]  # TODO FIXME
-    # print data_files
-    train_set_x = np.vstack([np.load(os.path.join(inpath, f)) for f in data_files])
-    train_set_y = np.hstack([np.ones(129) *i for i in range(len(data_files))])  # FIXME I REALLY SUCK
+import random
 
-    datasets = [(train_set_x, train_set_y), (train_set_x, train_set_y), (train_set_x, train_set_y)]
-    
+def dostuff(inpath):
+
+    data_files = [f for f in os.listdir(inpath) if f.endswith('.mel.npy')]
+    random.shuffle(data_files)
+    # data_files = data_files[:10]
+    artists = set([f[:18] for f in data_files])
+    artist_string_to_id = dict([(s,i) for i, s in enumerate(artists)])
+
+    train_set_y = np.hstack([[artist_string_to_id[f[:18]]] * 129 for f in data_files[:250]])
+    train_set_x = np.vstack([np.load(os.path.join(inpath, f)) for f in data_files[:250]])
+
+    test_set_y = np.hstack([[artist_string_to_id[f[:18]]] * 129 for f in data_files[250:350]])
+    test_set_x = np.vstack([np.load(os.path.join(inpath, f)) for f in data_files[250:350]])
+
+    validation_set_y = np.hstack([[artist_string_to_id[f[:18]]] * 129 for f in data_files[350:]])
+    validation_set_x = np.vstack([np.load(os.path.join(inpath, f)) for f in data_files[350:]])
+
+    datasets = [(train_set_x, train_set_y), (validation_set_x, validation_set_y), (test_set_x, test_set_y)]
     return datasets
 
 
 if __name__ == '__main__':
     datasets = dostuff(sys.argv[1])
-    
-    with gzip.open(sys.argv[2], 'w') as f:
+
+    with open(sys.argv[2], 'w') as f:
         pickle.dump(datasets, f)
