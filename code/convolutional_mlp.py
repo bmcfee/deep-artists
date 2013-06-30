@@ -110,10 +110,24 @@ class LeNetConvPoolLayer(object):
         # store parameters of this layer
         self.params = [self.W, self.b]
 
+        self.L2_sqr = (self.W ** 2).sum()
 
-def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
+    def __getstate__(self):
+        print 'you called getstate'
+        return (self.W, self.b)
+
+    def __setstate__(self, state):
+        print 'you called setstate'
+        W, b = state
+        self.W = W
+        self.b = b
+        self.params = [self.W, self.b]
+        self.L2_sqr = (self.W ** 2).sum()
+
+
+def evaluate_lenet5(learning_rate=0.01, n_epochs=100,
                     dataset='../data/mnist.pkl.gz',
-                    nkerns=[15], batch_size=100):
+                    nkerns=[10], batch_size=50):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -152,12 +166,11 @@ def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
     y = T.ivector('y')  # the labels are presented as 1D vector of
                         # [int] labels
 
-#     ishape = (28, 28)  # this is the size of MNIST images
     ishape = (64, 40)
     fshape = (9, 9)
     pshape = (8, 8)
 
-    last_layer_size = 512
+    last_layer_size = 1024
     n_out = 20
 
     ######################
@@ -203,7 +216,7 @@ def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
     layer3 = LogisticRegression(input=layer2.output, n_in=last_layer_size, n_out=n_out)
 
     # the cost we minimize during training is the NLL of the model
-    cost = layer3.negative_log_likelihood(y)
+    cost = layer3.negative_log_likelihood(y) #+ 0.002 * layer0.L2_sqr
 
     # create a function to compute the mistakes that are made by the model
     test_model = theano.function([index], layer3.errors(y),
@@ -246,7 +259,7 @@ def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
                            # found
     improvement_threshold = 0.995  # a relative improvement of this much is
                                    # considered significant
-    validation_frequency = min(n_train_batches, patience / 2)
+    validation_frequency = 200 #min(n_train_batches, patience / 2)
                                   # go through this many
                                   # minibatche before checking the network
                                   # on the validation set; in this case we
@@ -321,7 +334,7 @@ def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
         # cPickle.dump({'l0' : layer0,
         #               'l2' : layer2,
         #               'l3' : layer3}, out)
-        cPickle.dump({'l0' : layer0.W.eval()}, out)
+        cPickle.dump({'l0' : layer0}, out)
 
 
 if __name__ == '__main__':
