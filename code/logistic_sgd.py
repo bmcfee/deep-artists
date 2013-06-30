@@ -92,6 +92,10 @@ class LogisticRegression(object):
         # parameters of the model
         self.params = [self.W, self.b]
 
+        # reg term
+        self.L2_sqr = (self.W ** 2).sum()
+
+
     def negative_log_likelihood(self, y):
         """Return the mean of the negative log-likelihood of the prediction
         of this model under a given target distribution.
@@ -142,6 +146,19 @@ class LogisticRegression(object):
             return T.mean(T.neq(self.y_pred, y))
         else:
             raise NotImplementedError()
+
+
+    def __getstate__(self):
+        print 'you called getstate'
+        return (self.W, self.b)
+
+    def __setstate__(self, state):
+        print 'you called setstate'
+        W, b = state
+        self.W = W
+        self.b = b
+        self.params = [self.W, self.b]
+        self.L2_sqr = (self.W ** 2).sum()
 
 
 def load_data(dataset):
