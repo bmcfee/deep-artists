@@ -310,6 +310,13 @@ def evaluate_lenet5(learning_rate=0.02, n_epochs=100,
                           os.path.split(__file__)[1] +
                           ' ran for %.2fm' % ((end_time - start_time) / 60.))
 
+    with open('model_output.pkl', 'w') as out:
+        cPickle.dump({'l0' : layer0,
+                      'l2' : layer2,
+                      'l3' : layer3})
+
+
+
 if __name__ == '__main__':
     evaluate_lenet5(dataset='artist_blah.npy')
 
