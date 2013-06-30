@@ -102,6 +102,20 @@ class HiddenLayer(object):
         self.params = [self.W, self.b]
 
 
+    def __getstate__(self):
+        print 'you called getstate'
+        return (self.W, self.b)
+
+    def __setstate__(self, state):
+        print 'you called setstate'
+        W, b = state
+        self.W = W
+        self.b = b
+        self.params = [self.W, self.b]
+
+
+
+
 class MLP(object):
     """Multi-Layer Perceptron Class
 
