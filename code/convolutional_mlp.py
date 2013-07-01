@@ -125,9 +125,9 @@ class LeNetConvPoolLayer(object):
         self.L2_sqr = (self.W ** 2).sum()
 
 
-def evaluate_lenet5(learning_rate=0.01, n_epochs=100,
+def evaluate_lenet5(learning_rate=0.005, n_epochs=1000,
                     dataset='../data/mnist.pkl.gz',
-                    nkerns=[10], batch_size=50):
+                    nkerns=[10], batch_size=150):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -167,8 +167,8 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=100,
                         # [int] labels
 
     ishape = (64, 40)
-    fshape = (9, 9)
-    pshape = (8, 8)
+    fshape = (33, 11)
+    pshape = (16, 10)
 
     last_layer_size = 1024
     n_out = 20
@@ -216,7 +216,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=100,
     layer3 = LogisticRegression(input=layer2.output, n_in=last_layer_size, n_out=n_out)
 
     # the cost we minimize during training is the NLL of the model
-    cost = layer3.negative_log_likelihood(y) #+ 0.002 * layer0.L2_sqr
+    cost = layer3.negative_log_likelihood(y) + 0.002 * layer3.L2_sqr
 
     # create a function to compute the mistakes that are made by the model
     test_model = theano.function([index], layer3.errors(y),
@@ -254,7 +254,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=100,
     ###############
     print '... training'
     # early-stopping parameters
-    patience = 20000  # look as this many examples regardless
+    patience = 80000  # look as this many examples regardless
     patience_increase = 2  # wait this much longer when a new best is
                            # found
     improvement_threshold = 0.995  # a relative improvement of this much is
@@ -332,9 +332,10 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=100,
 
     with open('model_output.pkl', 'w') as out:
         # cPickle.dump({'l0' : layer0,
-        #               'l2' : layer2,
-        #               'l3' : layer3}, out)
         cPickle.dump({'l0' : layer0}, out)
+                      # 'l2' : layer2}, out)
+                      # 'l3' : layer3}, out)
+
 
 
 if __name__ == '__main__':
